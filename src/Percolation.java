@@ -8,7 +8,7 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 public class Percolation {
     private int N;
     private boolean[] isOpen;
-    public int numGridPts;
+    private int numGridPts;
     private int numGridPtsVirtual;
 
     private int numOpenSites;
@@ -36,7 +36,7 @@ public class Percolation {
         return  sub2indGrid(row,col,n) + 1;
     }
 
-    public static int[] indGrid2sub(int idx, int n){
+    private static int[] indGrid2sub(int idx, int n){
         int row = idx/n;
         int col = idx - row*n;
 //        int[] ans = {row,col}; //return 0-based indexing
@@ -58,7 +58,7 @@ public class Percolation {
         return (row == N-1);
     }
 
-    public void printIsOpen(){
+    private void printIsOpen(){
         StdOut.println(isOpen[virtualTopIdx]);
         int ind;
         for(int iRow = 1; iRow <= N; iRow++){

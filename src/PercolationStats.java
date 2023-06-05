@@ -6,7 +6,13 @@ import edu.princeton.cs.algs4.Stopwatch;
 public class PercolationStats {
     private double[] thresholds;
 
-
+    private static int[] indGrid2sub(int idx, int n){
+        int row = idx/n;
+        int col = idx - row*n;
+//        int[] ans = {row,col}; //return 0-based indexing
+        int[] ans = {row+1,col+1}; //return 1-based indexing
+        return ans;
+    }
 
     // perform independent trials on an n-by-n grid
     public PercolationStats(int n, int trials){
@@ -18,8 +24,9 @@ public class PercolationStats {
         thresholds = new double[trials];
         Percolation P;
         int[] subIdx;
+        int numGridPts = n*n;
         // Method 2, create array with random elements and shuffle
-        int[] shuffleArr = new int[n*n];
+        int[] shuffleArr = new int[numGridPts];
         for(int i = 0; i < (n*n); i++){
             shuffleArr[i] = i;
         }
@@ -50,11 +57,11 @@ public class PercolationStats {
 
                  */
 
-                int[] champ = P.indGrid2sub(shuffleArr[cnt], n);
+                int[] champ = indGrid2sub(shuffleArr[cnt],n);
                 P.open(champ[0], champ[1]);
                 cnt++;
             }
-            thresh = (double)P.numberOfOpenSites()/(double)P.numGridPts;
+            thresh = (double)P.numberOfOpenSites()/(double)numGridPts;
             thresholds[iTrial] = thresh;
         }//iTrial
     }
