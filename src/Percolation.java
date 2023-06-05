@@ -58,6 +58,19 @@ public class Percolation {
         return (row == N-1);
     }
 
+    public void printIsOpen(){
+        StdOut.println(isOpen[virtualTopIdx]);
+        int ind;
+        for(int iRow = 1; iRow <= N; iRow++){
+            for(int iCol = 1; iCol <= N; iCol++){
+                ind = sub2indVirtual(iRow,iCol,N);
+                StdOut.print(isOpen[ind] + ",");
+            }//iCol
+            StdOut.println();
+        }//iRow
+        StdOut.println(isOpen[virtualBottomIdx]);
+    }
+
 
     // Create N x N grid with all sites initially blocked
     public Percolation(int n){
@@ -70,7 +83,7 @@ public class Percolation {
         virtualBottomIdx = numGridPtsVirtual - 1;
         isOpen = new boolean[numGridPtsVirtual];
 
-        numOpenSites = numGridPts;
+        numOpenSites = 0;
 
         for(int i = 0; i < numGridPtsVirtual; i++)
             isOpen[i] = false;
@@ -100,7 +113,7 @@ public class Percolation {
         int ind = sub2indVirtual(row,col,N);
         if(!isOpen[ind]) {
             isOpen[ind] = true;
-            numOpenSites--;
+            numOpenSites++;
 
             // If top row, connect to virtual top site.
             if (isTopRow(row))
@@ -176,5 +189,6 @@ public class Percolation {
             StdOut.println("# of Open Sites: " + P.numberOfOpenSites());
             node++;
         }
+        P.printIsOpen();
     }
 }
