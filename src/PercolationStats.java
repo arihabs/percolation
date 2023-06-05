@@ -1,6 +1,7 @@
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 import edu.princeton.cs.algs4.StdStats;
+import edu.princeton.cs.algs4.Stopwatch;
 
 public class PercolationStats {
     private double[] thresholds;
@@ -17,13 +18,21 @@ public class PercolationStats {
         thresholds = new double[trials];
         Percolation P;
         int[] subIdx;
+        // Method 2, create array with random elements and shuffle
+        int[] shuffleArr = new int[n*n];
+        for(int i = 0; i < (n*n); i++){
+            shuffleArr[i] = i;
+        }
         for(int iTrial = 0; iTrial < trials; iTrial++){
             P = new Percolation(n); //should object be created outside loop and have it reset?
 
             // Open new site using  Knuth’s method: when reading the ith cell, select it with probability 1/i
             // to be the champion, replacing the previous champion. After reading all of the cells, use the surviving champion.
             // Skip cells that are open.
+            StdRandom.shuffle(shuffleArr);
+            int cnt = 0;
             while(!P.percolates()){
+                /*
                 int cnt = 1;
                 double prob = 0.0;
                 boolean sel = false;
@@ -39,7 +48,11 @@ public class PercolationStats {
                     }
                 }
 
+                 */
+
+                int[] champ = P.indGrid2sub(shuffleArr[cnt], n);
                 P.open(champ[0], champ[1]);
+                cnt++;
             }
             thresh = (double)P.numberOfOpenSites()/(double)P.numGridPts;
             thresholds[iTrial] = thresh;
@@ -72,11 +85,21 @@ public class PercolationStats {
 
     // test client (see below)
     public static void main(String[] args){
+        Stopwatch t1 = new Stopwatch();
         int nGrid = Integer.parseInt(args[0]);
         int nTrials = Integer.parseInt(args[1]);
         PercolationStats Pstats = new PercolationStats(nGrid, nTrials);
         StdOut.println("mean = " + Pstats.mean());
         StdOut.println("stddev = " + Pstats.stddev());
         StdOut.println("95% confidence interval = ["+ Pstats.confidenceLo() + ", " + Pstats.confidenceHi() + "]");
+        StdOut.println("Elapsed Time = " + t1.elapsedTime() + " seconds");
+        // Print using something similar to this:
+//        StdOut.printf("       min %10.3f\n", min(a));
+//        StdOut.printf("      mean %10.3f\n", mean(a));
+//        StdOut.printf("       max %10.3f\n", max(a));
+//        StdOut.printf("    stddev %10.3f\n", stddev(a));
+//        StdOut.printf("       var %10.3f\n", var(a));
+//        StdOut.printf("   stddevp %10.3f\n", stddevp(a));
+//        StdOut.printf("      varp %10.3f\n", varp(a));
     }
 }
