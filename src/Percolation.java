@@ -8,8 +8,10 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 public class Percolation {
     private int N;
     private boolean[] isOpen;
-    private int numGridPts;
+    public int numGridPts;
     private int numGridPtsVirtual;
+
+    private int numOpenSites;
 
     private int virtualTopIdx = 0;
 
@@ -34,7 +36,7 @@ public class Percolation {
         return  sub2indGrid(row,col,n) + 1;
     }
 
-    private static int[] indGrid2sub(int idx, int n){
+    public static int[] indGrid2sub(int idx, int n){
         int row = idx/n;
         int col = idx - row*n;
 //        int[] ans = {row,col}; //return 0-based indexing
@@ -68,6 +70,8 @@ public class Percolation {
         virtualBottomIdx = numGridPtsVirtual - 1;
         isOpen = new boolean[numGridPtsVirtual];
 
+        numOpenSites = numGridPts;
+
         for(int i = 0; i < numGridPtsVirtual; i++)
             isOpen[i] = false;
 
@@ -92,27 +96,30 @@ public class Percolation {
         if(!isInBounds(row, col, N))
             throw new IllegalArgumentException("(row,col) not in bounds.");
 
-        // Mark new site as open; Offset by 1 to account for virtual top element.
+        // Mark new site as open
         int ind = sub2indVirtual(row,col,N);
-        isOpen[ind] = true;
+        if(!isOpen[ind]) {
+            isOpen[ind] = true;
+            numOpenSites--;
 
-        // If top row, connect to virtual top site.
-        if(isTopRow(row))
-            wquf.union(ind,virtualTopIdx);
+            // If top row, connect to virtual top site.
+            if (isTopRow(row))
+                wquf.union(ind, virtualTopIdx);
 
-        // If bottom row, attach to virtual bottom site.
-        if(isBottomRow(row))
-            wquf.union(ind,virtualBottomIdx);
+            // If bottom row, attach to virtual bottom site.
+            if (isBottomRow(row))
+                wquf.union(ind, virtualBottomIdx);
 
-        // Connect to all of its adjacent open sites
-        int[][] idx_neighbor = {{row-1, col}, {row, col-1}, {row+1, col},{row, col+1}};
-        int currRow, currCol, neighborIdx = -1;
-        for(int i = 0; i < 4; i++){
-            currRow = idx_neighbor[i][0];
-            currCol = idx_neighbor[i][1];
-            if(isInBounds(currRow, currCol, N) && isOpen(currRow,currCol)) {
-                neighborIdx = sub2indVirtual(currRow, currCol, N);
-                wquf.union(ind, neighborIdx);
+            // Connect to all of its adjacent open sites
+            int[][] idx_neighbor = {{row - 1, col}, {row, col - 1}, {row + 1, col}, {row, col + 1}};
+            int currRow, currCol, neighborIdx = -1;
+            for (int i = 0; i < 4; i++) {
+                currRow = idx_neighbor[i][0];
+                currCol = idx_neighbor[i][1];
+                if (isInBounds(currRow, currCol, N) && isOpen(currRow, currCol)) {
+                    neighborIdx = sub2indVirtual(currRow, currCol, N);
+                    wquf.union(ind, neighborIdx);
+                }
             }
         }
     }
@@ -143,11 +150,7 @@ public class Percolation {
 
     // returns the number of open sites
     public int numberOfOpenSites(){
-        int cnt = 0;
-        for(boolean i : isOpen){
-            if(i) cnt++;
-        }
-        return cnt-2;// exclude virtual sites
+        return numOpenSites;
     }
 
     // does the system percolate?
@@ -159,6 +162,7 @@ public class Percolation {
 
     // test client
     public static void main(String[] args){
+        StdOut.println("Enter grid size N > 0:");
         int n = StdIn.readInt();
         Percolation P = new Percolation(n);
         StdOut.println("N: " + n + " # of Open Sites: " + P.numberOfOpenSites());
@@ -168,6 +172,7 @@ public class Percolation {
             subIdx = Percolation.indGrid2sub(node,n);
             StdOut.println("Opening Node " + node + ", at grid location (" +subIdx[0]+ "," +subIdx[1]+ ").");
             P.open(subIdx[0], subIdx[1]);
+            StdOut.println("Is full?: " + P.isFull(subIdx[0], subIdx[1]));
             StdOut.println("# of Open Sites: " + P.numberOfOpenSites());
             node++;
         }
